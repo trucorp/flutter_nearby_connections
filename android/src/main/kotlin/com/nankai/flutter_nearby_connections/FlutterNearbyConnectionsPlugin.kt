@@ -137,8 +137,8 @@ class FlutterNearbyConnectionsPlugin : FlutterPlugin, MethodCallHandler, Activit
             sendMessage -> {
                 Log.d("nearby_connections", "sendMessage")
                 val deviceId = call.argument<String>("deviceId")
-                val message = call.argument<String>("message")
-                serviceBindManager.mService?.sendStringPayload(deviceId!!, message!!)
+                val message = call.argument<Object>("message")
+                serviceBindManager.mService?.sendObjectPayload(deviceId!!, message!!)
             }
         }
     }

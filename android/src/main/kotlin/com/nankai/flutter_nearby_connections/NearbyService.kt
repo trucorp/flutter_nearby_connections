@@ -16,6 +16,10 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.ObjectOutput
+import java.io.ObjectOutputStream
 
 
 const val NOTIFICATION_ID = 101
@@ -49,6 +53,32 @@ class NearbyService : Service() {
     fun sendStringPayload(endpointId: String, str: String) {
         Log.d(TAG, "sendStringPayload $endpointId -> $str")
         connectionsClient.sendPayload(endpointId, Payload.fromBytes(str.toByteArray()))
+    }
+
+    fun sendPayload(endpointId: String, str: Payload) {
+        Log.d(TAG, "sendPayload $endpointId -> $str")
+        connectionsClient.sendPayload(endpointId, str)
+    }
+
+    fun sendObjectPayload(endpointId: String, str: Object) {
+        Log.d(TAG, "sendObjectPayload $endpointId -> $str")
+        val bos = ByteArrayOutputStream()
+        val out: ObjectOutput
+        try {
+            out = ObjectOutputStream(bos)
+            out.writeObject(str)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return
+        }
+
+        val valueBytes = bos.toByteArray()
+        connectionsClient.sendPayload(endpointId, Payload.fromBytes(valueBytes))
+    }
+
+    fun sendBytesPayload(endpointId: String, str: ByteArray) {
+        Log.d(TAG, "sendBytesPayload $endpointId -> $str")
+        connectionsClient.sendPayload(endpointId, Payload.fromBytes(str))
     }
 
     fun startAdvertising(strategy: Strategy, deviceName: String) {

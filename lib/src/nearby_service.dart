@@ -157,7 +157,7 @@ class NearbyService {
   }
 
   /// Sends a message encapsulated in a Data instance to nearby peers.
-  FutureOr<dynamic> sendMessage(String deviceID, String message) async {
+  FutureOr<dynamic> sendMessage(String deviceID, Object message) async {
     await _channel.invokeMethod(_sendMessage, <String, dynamic>{
       'deviceId': deviceID,
       if (_deviceName != null) 'senderDeviceId': _deviceName,
