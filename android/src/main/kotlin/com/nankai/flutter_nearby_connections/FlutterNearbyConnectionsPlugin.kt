@@ -9,6 +9,7 @@ import androidx.annotation.NonNull
 import androidx.core.content.ContextCompat.startForegroundService
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.ConnectionsClient
+import com.google.android.gms.nearby.connection.Payload
 import com.google.android.gms.nearby.connection.Strategy
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -35,6 +36,9 @@ const val invitePeer = "invite_peer"
 const val disconnectPeer = "disconnect_peer"
 
 const val sendMessage = "send_message"
+const val sendString = "send_string"
+const val sendObject = "send_object"
+const val sendBytes = "send_bytes"
 
 const val INVOKE_CHANGE_STATE_METHOD = "invoke_change_state_method"
 const val INVOKE_MESSAGE_RECEIVE_METHOD = "invoke_message_receive_method"
@@ -137,8 +141,26 @@ class FlutterNearbyConnectionsPlugin : FlutterPlugin, MethodCallHandler, Activit
             sendMessage -> {
                 Log.d("nearby_connections", "sendMessage")
                 val deviceId = call.argument<String>("deviceId")
+                val message = call.argument<String>("message")
+                serviceBindManager.mService?.sendStringPayload(deviceId!!, message!!)
+            }
+            sendString -> {
+                Log.d("nearby_connections", "sendString")
+                val deviceId = call.argument<String>("deviceId")
+                val message = call.argument<String>("message")
+                serviceBindManager.mService?.sendStringPayload(deviceId!!, message!!)
+            }
+            sendObject -> {
+                Log.d("nearby_connections", "sendObject")
+                val deviceId = call.argument<String>("deviceId")
                 val message = call.argument<Object>("message")
                 serviceBindManager.mService?.sendObjectPayload(deviceId!!, message!!)
+            }
+            sendBytes -> {
+                Log.d("nearby_connections", "sendBytes")
+                val deviceId = call.argument<String>("deviceId")
+                val message = call.argument<ByteArray>("message")
+                serviceBindManager.mService?.sendBytesPayload(deviceId!!, message!!)
             }
         }
     }

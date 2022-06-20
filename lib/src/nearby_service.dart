@@ -8,6 +8,10 @@ const _stopBrowsingForPeers = 'stop_browsing_for_peers';
 const _invitePeer = 'invite_peer';
 const _disconnectPeer = 'disconnect_peer';
 const _sendMessage = 'send_message';
+const _sendBytes = 'send_bytes';
+const _sendString = 'send_string';
+const _sendObject = 'send_object';
+
 const _invokeChangeStateMethod = "invoke_change_state_method";
 const _invokeMessageReceiveMethod = "invoke_message_receive_method";
 const _invokeNearbyRunning = "nearby_running";
@@ -157,8 +161,35 @@ class NearbyService {
   }
 
   /// Sends a message encapsulated in a Data instance to nearby peers.
-  FutureOr<dynamic> sendMessage(String deviceID, Object message) async {
+  FutureOr<dynamic> sendMessage(String deviceID, String message) async {
     await _channel.invokeMethod(_sendMessage, <String, dynamic>{
+      'deviceId': deviceID,
+      if (_deviceName != null) 'senderDeviceId': _deviceName,
+      'message': message,
+    });
+  }
+
+  /// Sends a string message
+  FutureOr<dynamic> sendString(String deviceID, String message) async {
+    await _channel.invokeMethod(_sendString, <String, dynamic>{
+      'deviceId': deviceID,
+      if (_deviceName != null) 'senderDeviceId': _deviceName,
+      'message': message,
+    });
+  }
+
+  /// Sends a string message
+  FutureOr<dynamic> sendObject(String deviceID, Object message) async {
+    await _channel.invokeMethod(_sendObject, <String, dynamic>{
+      'deviceId': deviceID,
+      if (_deviceName != null) 'senderDeviceId': _deviceName,
+      'message': message,
+    });
+  }
+
+  /// Sends a string message
+  FutureOr<dynamic> sendBytes(String deviceID, ByteData message) async {
+    await _channel.invokeMethod(_sendBytes, <String, dynamic>{
       'deviceId': deviceID,
       if (_deviceName != null) 'senderDeviceId': _deviceName,
       'message': message,

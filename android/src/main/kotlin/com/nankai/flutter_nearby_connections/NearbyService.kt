@@ -55,11 +55,6 @@ class NearbyService : Service() {
         connectionsClient.sendPayload(endpointId, Payload.fromBytes(str.toByteArray()))
     }
 
-    fun sendPayload(endpointId: String, str: Payload) {
-        Log.d(TAG, "sendPayload $endpointId -> $str")
-        connectionsClient.sendPayload(endpointId, str)
-    }
-
     fun sendObjectPayload(endpointId: String, str: Object) {
         Log.d(TAG, "sendObjectPayload $endpointId -> $str")
         val bos = ByteArrayOutputStream()
