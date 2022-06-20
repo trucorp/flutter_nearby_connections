@@ -21,17 +21,16 @@ typedef StateChangedCallback = Function(List<Device> arguments);
 typedef DataReceivedCallback = Function(dynamic data);
 
 class NearbyService {
-  static const MethodChannel _channel =
-      const MethodChannel('flutter_nearby_connections');
+  static MethodChannel _channel = MethodChannel('flutter_nearby_connections');
 
   final _stateChangedController = StreamController<List<Device>>.broadcast();
 
-  Stream<List<Device>> get _stateChangedStream =>
-      _stateChangedController.stream;
+  Stream<List<Device>> get _stateChangedStream => _stateChangedController.stream;
 
   final _dataReceivedController = StreamController<dynamic>.broadcast();
 
   Stream<dynamic> get _dataReceivedStream => _dataReceivedController.stream;
+  String? _deviceName;
 
   /// The class [NearbyService] supports the discovery of services provided by
   /// nearby devices and supports communicating with those services through
@@ -51,7 +50,15 @@ class NearbyService {
       {required String serviceType,
       required Strategy strategy,
       String? deviceName,
+      String? channelName,
       required Function callback}) async {
+
+    _deviceName = deviceName;
+
+    if(channelName != null) {
+      NearbyService._channel = MethodChannel(channelName);
+    }
+
     assert(serviceType.length <= 15 &&
         //serviceType != null &&
         serviceType.isNotEmpty);
@@ -60,15 +67,13 @@ class NearbyService {
       debugPrint("method: ${handler.method} | arguments: ${handler.arguments}");
       switch (handler.method) {
         case _invokeChangeStateMethod:
-          List<Device> devices = jsonDecode(handler.arguments)
-              .map<Device>((dynamic device) => Device.fromJson(device))
-              .toList();
+          List<Device> devices =
+              jsonDecode(handler.arguments).map<Device>((dynamic device) => Device.fromJson(device)).toList();
           _stateChangedController.add(devices);
           break;
         case _invokeMessageReceiveMethod:
           _dataReceivedController.add(handler.arguments);
-          debugPrint(
-              "_invokeMessageReceiveMethod | arguments: ${handler.arguments}");
+          debugPrint("_invokeMessageReceiveMethod | arguments: ${handler.arguments}");
           break;
         case _invokeNearbyRunning:
           await Future.delayed(Duration(seconds: 1));
@@ -136,8 +141,7 @@ class NearbyService {
 
   /// Invites a discovered peer to join a nearby connections session.
   /// the [deviceID] is current Device
-  FutureOr<dynamic> invitePeer(
-      {required String deviceID, @required String? deviceName}) async {
+  FutureOr<dynamic> invitePeer({required String deviceID, @required String? deviceName}) async {
     await _channel.invokeMethod(
       _invitePeer,
       <String, dynamic>{
@@ -159,6 +163,7 @@ class NearbyService {
   FutureOr<dynamic> sendMessage(String deviceID, String message) async {
     await _channel.invokeMethod(_sendMessage, <String, dynamic>{
       'deviceId': deviceID,
+      if (_deviceName != null) 'senderDeviceId': _deviceName,
       'message': message,
     });
   }
@@ -168,15 +173,13 @@ class NearbyService {
   /// a peer is invited to connect by another peer, or 2 peers are connected.
   /// [stateChangedSubscription] will return you a list of [Device].
   /// see [StateChangedCallback]
-  StreamSubscription stateChangedSubscription(
-      {required StateChangedCallback callback}) =>
+  StreamSubscription stateChangedSubscription({required StateChangedCallback callback}) =>
       _stateChangedStream.listen(callback);
 
   /// The [dataReceivedSubscription] helps you listen when a peer sends you
   /// text messages. and it returns you a object [Data].
   /// It returns a [StreamSubscription] so you can cancel listening at any time.
   /// see [DataReceivedCallback]
-  StreamSubscription dataReceivedSubscription(
-      {required DataReceivedCallback callback}) =>
+  StreamSubscription dataReceivedSubscription({required DataReceivedCallback callback}) =>
       _dataReceivedStream.listen(callback);
 }
