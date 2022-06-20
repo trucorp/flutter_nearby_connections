@@ -295,6 +295,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
     await nearbyService.init(
         serviceType: 'mpconn',
         deviceName: devInfo,
+        channelName: "channel1",
         strategy: Strategy.P2P_CLUSTER,
         callback: (isRunning) async {
           if (isRunning) {
