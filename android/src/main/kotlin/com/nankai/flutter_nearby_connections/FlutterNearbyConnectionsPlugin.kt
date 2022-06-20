@@ -22,7 +22,7 @@ import java.lang.Exception
 import kotlin.system.exitProcess
 
 
-const val SERVICE_ID = "flutter_nearby_connections"
+var SERVICE_ID = "flutter_nearby_connections"
 
 const val initNearbyService = "init_nearby_service"
 const val startAdvertisingPeer = "start_advertising_peer"
@@ -55,6 +55,8 @@ class FlutterNearbyConnectionsPlugin : FlutterPlugin, MethodCallHandler, Activit
     private lateinit var serviceBindManager: ServiceBindManager
     private var isBind = false
 
+    var serviceChannel = "channel1"
+
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.flutterEngine.dartExecutor, viewTypeId)
         channel.setMethodCallHandler(this)
@@ -78,6 +80,13 @@ class FlutterNearbyConnectionsPlugin : FlutterPlugin, MethodCallHandler, Activit
                 connectionsClient = Nearby.getConnectionsClient(activity)
                 serviceBindManager = ServiceBindManager(activity, channel, callbackUtils)
                 serviceBindManager.bindService()
+
+                serviceChannel = if (call.argument<String>("channel").isNullOrEmpty())
+                    "channel1"
+                else
+                    call.argument<String>("channel")!!
+
+                SERVICE_ID = serviceChannel
 
                 localDeviceName = if (call.argument<String>("deviceName").isNullOrEmpty())
                     Build.MANUFACTURER + " " + Build.MODEL

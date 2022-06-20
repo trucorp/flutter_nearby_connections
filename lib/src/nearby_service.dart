@@ -55,10 +55,6 @@ class NearbyService {
 
     _deviceName = deviceName;
 
-    if(channelName != null) {
-      NearbyService._channel = MethodChannel(channelName);
-    }
-
     assert(serviceType.length <= 15 &&
         //serviceType != null &&
         serviceType.isNotEmpty);
@@ -104,6 +100,7 @@ class NearbyService {
         'deviceName': deviceName ?? "",
         'serviceType': serviceType,
         'strategy': strategyValue,
+        'channel': channelName,
       },
     );
     if (Platform.isIOS) {

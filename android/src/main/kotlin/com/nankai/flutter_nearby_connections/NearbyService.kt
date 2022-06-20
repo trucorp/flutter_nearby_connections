@@ -19,7 +19,7 @@ import com.google.android.gms.nearby.connection.*
 
 
 const val NOTIFICATION_ID = 101
-const val CHANNEL_ID = "channel"
+var CHANNEL_ID = "channel"
 
 class NearbyService : Service() {
     private val binder: IBinder = LocalBinder(this)
