@@ -24,7 +24,9 @@ class Device {
   /// See [SessionState]
   SessionState state = SessionState.notConnected;
 
-  Device(this.deviceId, this.deviceName, int state) {
+  Map<String, dynamic>? discoveryInfo;
+
+  Device({required this.deviceId, required this.deviceName, this.discoveryInfo, required int state}) {
     switch (state) {
       case 1:
         this.state = SessionState.connecting;
@@ -38,7 +40,20 @@ class Device {
     }
   }
 
-  factory Device.fromJson(json) {
-    return Device(json["deviceId"], json["deviceName"], json["state"]);
+  factory Device.fromJson(Map<String, dynamic> map) {
+    return Device(deviceId: map["deviceId"],
+        deviceName: map["deviceName"],
+        discoveryInfo: map["discoveryInfo"],
+        state: map["state"]
+    );
   }
+
+  @override
+  bool operator ==(Object? other) {
+    return other is Device &&
+        deviceId == other.deviceId;
+  }
+
+  @override
+  int get hashCode => deviceId.hashCode;
 }

@@ -6,6 +6,7 @@ import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import com.google.gson.Gson
 import io.flutter.plugin.common.MethodChannel
+import java.io.*
 
 const val connecting = 1
 const val connected = 2
@@ -60,9 +61,30 @@ class CallbackUtils constructor(private val channel: MethodChannel, private val 
 
     private val payloadCallback: PayloadCallback = object : PayloadCallback() {
         override fun onPayloadReceived(endpointId: String, payload: Payload) {
-            Log.d("nearby_connections", "onPayloadReceived $endpointId")
-            val args = mutableMapOf("deviceId" to endpointId, "message" to String(payload.asBytes()!!))
-            channel.invokeMethod(INVOKE_MESSAGE_RECEIVE_METHOD, args)
+            val bis = ByteArrayInputStream(payload.asBytes())
+            var `in`: ObjectInput? = null
+
+            try {
+                `in` = ObjectInputStream(bis)
+                val payloadObject = `in`.readObject()
+
+                Log.d("nearby_connections", "onPayloadReceived $endpointId")
+                val args = mutableMapOf("deviceId" to endpointId, "message" to payloadObject)
+                channel.invokeMethod(INVOKE_MESSAGE_RECEIVE_METHOD, args)
+
+            } catch (e: Exception) {
+                Log.d("nearby_connections", "onPayloadReceivedException!")
+                e.printStackTrace()
+            }
+
+            if (`in` != null) {
+                try {
+                    `in`.close()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+
+            }
         }
 
         override fun onPayloadTransferUpdate(endpointId: String,

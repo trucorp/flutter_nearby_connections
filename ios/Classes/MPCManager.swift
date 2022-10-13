@@ -48,7 +48,7 @@ class MPCManager: NSObject {
         }
     }
     
-    func setup(serviceType: String, deviceName: String) {
+    func setup(serviceType: String, deviceName: String, discoveryInfo: [String: String]) {
         if let data = UserDefaults.standard.data(forKey: deviceName), let id = NSKeyedUnarchiver.unarchiveObject(with: data) as? MCPeerID {
             self.localPeerID = id
         } else {
@@ -58,7 +58,7 @@ class MPCManager: NSObject {
             self.localPeerID = peerID
         }
         
-        self.advertiser = MCNearbyServiceAdvertiser(peer: localPeerID, discoveryInfo: nil, serviceType: serviceType)
+        self.advertiser = MCNearbyServiceAdvertiser(peer: localPeerID, discoveryInfo: discoveryInfo, serviceType: serviceType)
         self.advertiser.delegate = self
         
         self.browser = MCNearbyServiceBrowser(peer: localPeerID, serviceType: serviceType)
@@ -110,9 +110,9 @@ class MPCManager: NSObject {
         device?.disconnect()
     }
     
-    func addNewDevice(for id: MCPeerID) -> Device {
+    func addNewDevice(for id: MCPeerID, discoveryInfo info: [String : String]? = nil) -> Device {
         devices = devices.filter{$0.peerID.displayName != id.displayName}
-        let device = Device(peerID: id)
+        let device = Device(peerID: id, discoveryInfo: info)
         self.devices.append(device)
         return device
     }
@@ -166,7 +166,7 @@ extension MPCManager: MCNearbyServiceAdvertiserDelegate {
 extension MPCManager: MCNearbyServiceBrowserDelegate {
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
         // found peer, create a device with this peerID
-        addNewDevice(for: peerID)
+        addNewDevice(for: peerID, discoveryInfo: info)
     }
     
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {

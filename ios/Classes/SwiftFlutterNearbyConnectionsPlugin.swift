@@ -36,12 +36,14 @@ public class SwiftFlutterNearbyConnectionsPlugin: NSObject, FlutterPlugin {
         var deviceId:String
         var deviceName:String
         var state:Int
+        var discoveryInfo: [String: String]
         
         func toStringAnyObject() -> [String: Any] {
             return [
                 "deviceId": deviceId,
                 "deviceName": deviceName,
-                "state": state
+                "state": state,
+                "discoveryInfo" : discoveryInfo
             ]
         }
     }
@@ -59,7 +61,7 @@ public class SwiftFlutterNearbyConnectionsPlugin: NSObject, FlutterPlugin {
     }
     
     @objc func stateChanged(){
-        let devices = MPCManager.instance.devices.compactMap({return DeviceJson(deviceId: $0.peerID.displayName, deviceName: $0.peerID.displayName, state: $0.state.rawValue)})
+        let devices = MPCManager.instance.devices.compactMap({return DeviceJson(deviceId: $0.peerID.displayName, deviceName: $0.peerID.displayName, state: $0.state.rawValue, discoveryInfo: $0.discoveryInfo)})
         channel.invokeMethod(INVOKE_CHANGE_STATE_METHOD, arguments: JSON(devices.compactMap({return $0.toStringAnyObject()})).rawString())
     }
     
@@ -111,9 +113,12 @@ public class SwiftFlutterNearbyConnectionsPlugin: NSObject, FlutterPlugin {
             if (deviceName.isEmpty){
                 deviceName =  UIDevice.current.name
             }
-               
-            MPCManager.instance.setup(serviceType: serviceType, deviceName: deviceName)
-            currentReceivedDevice = Device(peerID: MPCManager.instance.localPeerID)
+
+            var discoveryInfo:[String: String] = data["discoveryInfo"] as? [String: String] ?? [:]
+
+
+            MPCManager.instance.setup(serviceType: serviceType, deviceName: deviceName, discoveryInfo: discoveryInfo)
+            currentReceivedDevice = Device(peerID: MPCManager.instance.localPeerID, discoveryInfo: discoveryInfo)
             result(true)
         case .startAdvertisingPeer:
             MPCManager.instance.startAdvertisingPeer()

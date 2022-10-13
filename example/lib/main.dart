@@ -317,7 +317,7 @@ class _DevicesListScreenState extends State<DevicesListScreen> {
         nearbyService.stateChangedSubscription(callback: (devicesList) {
       devicesList.forEach((element) {
         print(
-            " deviceId: ${element.deviceId} | deviceName: ${element.deviceName} | state: ${element.state}");
+            " deviceId: ${element.deviceId} | deviceName: ${element.deviceName} | state: ${element.state} | discoveryInfo: ${element.discoveryInfo}");
 
         if (Platform.isAndroid) {
           if (element.state == SessionState.connected) {

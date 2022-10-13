@@ -7,11 +7,13 @@ class Device: NSObject {
     var session: MCSession?
     var state = MCSessionState.notConnected
     var lastMessageReceived: Message?
+    var discoveryInfo: [String: String]
     
     static let messageReceivedNotification = Notification.Name("DeviceDidReceiveMessage")
     
-    init(peerID: MCPeerID) {
+    init(peerID: MCPeerID, discoveryInfo: [String : String]?) {
         self.peerID = peerID
+        self.discoveryInfo = discoveryInfo ?? [:]
         super.init()
     }
     

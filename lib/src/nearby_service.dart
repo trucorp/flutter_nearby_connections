@@ -67,11 +67,13 @@ class NearbyService {
       debugPrint("method: ${handler.method} | arguments: ${handler.arguments}");
       switch (handler.method) {
         case _invokeChangeStateMethod:
+          print("ARGS :" + handler.arguments);
           List<Device> devices =
               jsonDecode(handler.arguments).map<Device>((dynamic device) => Device.fromJson(device)).toList();
           _stateChangedController.add(devices);
           break;
         case _invokeMessageReceiveMethod:
+          print("DATA RECEIVED");
           _dataReceivedController.add(handler.arguments);
           debugPrint("_invokeMessageReceiveMethod | arguments: ${handler.arguments}");
           break;
@@ -162,6 +164,7 @@ class NearbyService {
 
   /// Sends a message encapsulated in a Data instance to nearby peers.
   FutureOr<dynamic> sendMessage(String deviceID, String message) async {
+    print("SendMessage");
     await _channel.invokeMethod(_sendMessage, <String, dynamic>{
       'deviceId': deviceID,
       if (_deviceName != null) 'senderDeviceId': _deviceName,
