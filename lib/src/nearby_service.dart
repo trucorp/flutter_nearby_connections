@@ -73,7 +73,6 @@ class NearbyService {
           _stateChangedController.add(devices);
           break;
         case _invokeMessageReceiveMethod:
-          print("DATA RECEIVED");
           _dataReceivedController.add(handler.arguments);
           debugPrint("_invokeMessageReceiveMethod | arguments: ${handler.arguments}");
           break;
