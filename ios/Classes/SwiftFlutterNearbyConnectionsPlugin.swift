@@ -66,6 +66,7 @@ public class SwiftFlutterNearbyConnectionsPlugin: NSObject, FlutterPlugin {
     }
     
     @objc func messageReceived(notification: Notification) {
+    print("messageReceived");
         do {
             if let data = notification.userInfo?["data"] as? Data, let stringData = JSON(data).rawString() {
                 let dict = convertToDictionary(text: stringData)
@@ -164,10 +165,10 @@ public class SwiftFlutterNearbyConnectionsPlugin: NSObject, FlutterPlugin {
                 return
             }
             do {
-                let jsonData = try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
+               // let jsonData = try JSONSerialization.data(withJSONObject: dict["message"], options: [])
                 if let device = MPCManager.instance.findDevice(for: dict["deviceId"] as! String) {
                     currentReceivedDevice = device
-                    try device.send(data: jsonData)
+                    try device.send(text: dict["message"] as! String)
                     result(true)
                     return
                 }
